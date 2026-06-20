@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <title>METEO ASTRO - Configuration</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" charset="UTF-8">
+  <link rel="icon" type="image/png" href="https://www.raspberryme.com/esp32-web-server-gauges/favicon.png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Arial', sans-serif; background-color: #CCCAC9; min-height: 100vh; display: flex; flex-direction: column; }
+    .topnav { background-color: #2c3e50; color: white; padding: 15px; position: sticky; top: 0; z-index: 1000; }
+    .topnav-content { display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto; width: 100%; }
+    .encadre { background-color: #46b8da; color: white; padding: 12px 25px; font-size: 1.6rem; border-radius: 8px; text-align: center; margin: 0 0 10px 0; text-transform: uppercase; font-weight: bold; }
+    .content { padding: 20px; max-width: 1200px; margin: 0 auto; width: 100%; flex-grow: 1; display: flex; justify-content: center; align-items: flex-start;}
+    .btn-ota { background: linear-gradient(135deg, #46b8da 0%, #369cb9 100%); border: none; color: white; padding: 12px 20px; text-align: center; font-size: 14px; cursor: pointer; border-radius: 25px; transition: all 0.3s ease; white-space: nowrap; }
+    .btn-ota:hover { background: linear-gradient(135deg, #369cb9 0%, #2a7b95 100%); transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+    .constants-form { background: linear-gradient(135deg, #ecf0f1 0%, #dfe6e9 100%); padding: 30px; border-radius: 12px; margin: 30px auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-align: center; width: 100%; max-width: 500px; }
+    .constants-form .card-title { font-size: 1.2rem; font-weight: bold; color: #2c3e50; margin-bottom: 25px; border-bottom: 2px solid #46b8da; padding-bottom: 8px; }
+    .constant-input { margin: 15px 0; display: flex; align-items: center; background: white; padding: 10px 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); width: 100%; }
+    .constant-input label { width: 110px; font-weight: bold; color: #2c3e50; text-align: left; font-size: 0.95rem; flex-shrink: 0; }
+    .input-with-current { display: flex; align-items: center; flex: 1; gap: 15px; justify-content: space-between; }
+    .constant-input input, .constant-input select { padding: 8px 12px; border: 1px solid #bdc3c7; border-radius: 6px; font-size: 0.9rem; transition: border-color 0.3s ease; text-align: center; width: 120px; height: 40px; flex-shrink: 0; }
+    .current-value { padding: 8px 12px; background: linear-gradient(135deg, #46b8da 0%, #369cb9 100%); color: white; border-radius: 6px; min-width: 80px; text-align: center; font-weight: bold; font-size: 0.9rem; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .center-container { display: flex; justify-content: center; width: 100%; margin-top: 25px; }
+    .section-divider { margin: 25px 0 15px 0; border-top: 2px dashed #bdc3c7; }
+    
+    .live-data-box { background: #f8f9fa; border: 1px solid #bdc3c7; border-radius: 6px; padding: 10px; font-size: 0.9rem; color: #2c3e50; margin-top: 15px; }
+    
+    @media (max-width: 768px) { .constant-input { flex-direction: column; gap: 10px; } .constant-input label { text-align: center; width:100%; } .input-with-current { width: 100%; } }
+  </style>
+</head>
+<body>
+
+  <div class="topnav">
+    <div class="topnav-content">
+      <div style="flex: 1;"><a href="/" style="color: white; text-decoration: none; font-size: 1.5rem;"><i class="fas fa-arrow-left"></i></a></div>
+      <div style="flex: 2; display: flex; justify-content: center;"><h1 class="encadre">RÉGLAGES</h1></div>
+      <div style="flex: 1;"></div>
+    </div>
+  </div>
+
+  <div class="content">
+    <div class="constants-form">
+      <form action='/constantesmlx' method='post' id="constants-form">
+        
+        <p class="card-title"><i class="fas fa-cog icon"></i> Constantes MLX / Chauffage</p>
+        <div class="constant-input"><label>K1</label><div class="input-with-current"><input type='text' name='newK1' placeholder="Val."><span class="current-value" id="currentK1">...</span></div></div>
+        <div class="constant-input"><label>K2</label><div class="input-with-current"><input type='text' name='newK2' placeholder="Val."><span class="current-value" id="currentK2">...</span></div></div>
+        <div class="constant-input"><label>K3</label><div class="input-with-current"><input type='text' name='newK3' placeholder="Val."><span class="current-value" id="currentK3">...</span></div></div>
+        <div class="constant-input"><label>K4</label><div class="input-with-current"><input type='text' name='newK4' placeholder="Val."><span class="current-value" id="currentK4">...</span></div></div>
+        <div class="constant-input"><label>K5</label><div class="input-with-current"><input type='text' name='newK5' placeholder="Val."><span class="current-value" id="currentK5">...</span></div></div>
+        <div class="constant-input"><label>K6</label><div class="input-with-current"><input type='text' name='newK6' placeholder="Val."><span class="current-value" id="currentK6">...</span></div></div>
+        <div class="constant-input"><label>K7</label><div class="input-with-current"><input type='text' name='newK7' placeholder="Val."><span class="current-value" id="currentK7">...</span></div></div>
+        <div class="constant-input"><label>T° Clair</label><div class="input-with-current"><input type='text' name='newTempClair' placeholder="Val."><span class="current-value" id="currentTempClair">...</span></div></div>
+        <div class="constant-input"><label>T° Couvert</label><div class="input-with-current"><input type='text' name='newTempCouvert' placeholder="Val."><span class="current-value" id="currentTempCouvert">...</span></div></div>
+        <div class="constant-input"><label>Seuil Chau.</label><div class="input-with-current"><input type='text' name='newLuxChauffage' placeholder="En Lux"><span class="current-value" id="currentLuxChauffage">...</span></div></div>
+        
+        <div class="section-divider"></div>
+        <p class="card-title" style="border:none;"><i class="fas fa-tools icon"></i> Sondes & Calibration</p>
+
+        <div class="constant-input">
+            <label>Sonde Principale</label>
+            <div class="input-with-current" style="justify-content: center;">
+              <select name="newCapteur" id="newCapteur" style="width: 100%; max-width:200px;">
+                <option value="1">BME280</option>
+                <option value="2">MLX90614 (Interne)</option>
+                <option value="3">SHTx (Sensirion)</option>
+              </select>
+            </div>
+        </div>
+
+        <div class="constant-input">
+          <label>Offset Température</label>
+          <div class="input-with-current">
+            <input type='text' name='newCorrTemp' placeholder="Ex: -1.5">
+            <span class="current-value" id="currentCorrTemp">...</span>
+          </div>
+        </div>
+
+        <div class="constant-input">
+          <label>Offset Pression</label>
+          <div class="input-with-current">
+            <input type='text' name='newCorrPress' placeholder="Ex: +6.0">
+            <span class="current-value" id="currentCorrPress">...</span>
+          </div>
+        </div>
+        
+        <div class="section-divider"></div>
+        <p class="card-title" style="border:none;"><i class="fas fa-cloud-rain icon"></i> Détection Pluie (RC-SPC1K)</p>
+        
+        <div class="constant-input" style="flex-direction: column; align-items: stretch; padding-bottom: 20px;">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                <span style="font-weight: bold; color: #2c3e50;">Seuil de déclenchement</span>
+                <span class="current-value" id="currentSeuilPluie" style="min-width: 60px;">...</span>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <span style="font-size: 0.8rem; color: #7f8c8d; font-weight: bold;">SEC</span>
+                <input type="range" name="newSeuilPluie" id="sliderSeuilPluie" min="500" max="20000" step="100" style="flex: 1;" oninput="document.getElementById('sliderVal').textContent = this.value + ' Hz'">
+                <span style="font-size: 0.8rem; color: #3498db; font-weight: bold;">PLUIE</span>
+            </div>
+            
+            <div style="text-align: center; color:#e67e22; font-weight:bold; margin-bottom: 5px;">
+                Cible réglée : <span id="sliderVal">...</span>
+            </div>
+
+            <div class="live-data-box">
+                <i class="fas fa-satellite-dish" style="color: #e74c3c; animation: blink 2s infinite;"></i> <strong>Sondage en direct :</strong><br>
+                <span style="display:inline-block; margin-top:5px;">Fréquence RC-SPC1K : <strong id="liveFreq" style="color:#27ae60;">...</strong> Hz</span><br>
+                <span>Température surface : <strong id="liveTemp" style="color:#c0392b;">...</strong> °C</span>
+            </div>
+        </div>
+        
+        <style>@keyframes blink { 0% {opacity: 1;} 50% {opacity: 0.3;} 100% {opacity: 1;} }</style>
+        
+        <div class="center-container">
+          <button type='submit' class="btn-ota" id="submitBtn"><i class="fas fa-save"></i> Sauvegarder</button>
+        </div>
+      </form>
+      
+      <div style="margin-top: 30px; border-top: 2px solid #bdc3c7; padding-top: 25px;">
+        <a href="/calibration.html" style="text-decoration: none;">
+          <button class="btn-ota" type="button" style="width: 100%; background: linear-gradient(135deg, #e67e22 0%, #d35400 100%); font-size: 1.1rem; padding: 15px;">
+            <i class="fas fa-chart-line"></i> Outil de Calibration MLX90614
+          </button>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    async function loadCurrentValues() {
+        try {
+            const response = await fetch('/readings');
+            if (response.ok) {
+                const data = await response.json();
+                
+                const setVal = (id, val) => {
+                    if(val !== undefined && document.getElementById(id)) {
+                        document.getElementById(id).textContent = parseFloat(val).toFixed(2);
+                    }
+                };
+
+                setVal("currentK1", data.k1); setVal("currentK2", data.k2);
+                setVal("currentK3", data.k3); setVal("currentK4", data.k4);
+                setVal("currentK5", data.k5); setVal("currentK6", data.k6);
+                setVal("currentK7", data.k7);
+                setVal("currentTempClair", data.temp_ciel_clair);
+                setVal("currentTempCouvert", data.temp_ciel_couvert);
+                setVal("currentLuxChauffage", data.lux_threshold_chauffage);
+                setVal("currentCorrTemp", data.corr_temp);
+                setVal("currentCorrPress", data.corr_press);
+
+                if (data.capteur_ambiant !== undefined) {
+                    document.getElementById('newCapteur').value = data.capteur_ambiant;
+                }
+
+                // GESTION DU CAPTEUR DE PLUIE
+                if (data.seuil_pluie !== undefined) {
+                    document.getElementById('currentSeuilPluie').textContent = data.seuil_pluie;
+                    
+                    // On n'actualise la position du slider que s'il n'a pas encore été touché par l'utilisateur
+                    if(document.getElementById('sliderVal').textContent === '...') {
+                        document.getElementById('sliderSeuilPluie').value = data.seuil_pluie;
+                        document.getElementById('sliderVal').textContent = data.seuil_pluie + ' Hz';
+                    }
+                }
+                
+                // Mises à jour des données en direct
+                if (data.freq_gouttes !== undefined) document.getElementById('liveFreq').textContent = data.freq_gouttes;
+                if (data.temp_gouttes !== undefined) document.getElementById('liveTemp').textContent = parseFloat(data.temp_gouttes).toFixed(1);
+            }
+        } catch (error) { console.error("Erreur de chargement:", error); }
+    }
+
+    document.getElementById('constants-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sauvegarde...';
+        btn.disabled = true;
+
+        const formData = new FormData(this);
+        
+        try {
+            const response = await fetch('/constantesmlx', { method: 'POST', body: formData });
+            if (response.ok) {
+                document.querySelectorAll('#constants-form input[type="text"]').forEach(input => input.value = '');
+                await loadCurrentValues();
+                btn.innerHTML = '<i class="fas fa-check"></i> Sauvegardé !';
+                btn.style.background = "linear-gradient(135deg, #2ecc71 0%, #27ae60 100%)";
+            }
+        } catch (error) {
+            btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Erreur';
+            btn.style.background = "linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)";
+        }
+
+        setTimeout(() => {
+            btn.innerHTML = originalText;
+            btn.style.background = "";
+            btn.disabled = false;
+        }, 2000);
+    });
+
+    // On charge les valeurs initiales, puis on met à jour les données brutes toutes les 5 secondes
+    document.addEventListener('DOMContentLoaded', () => {
+        loadCurrentValues();
+        setInterval(loadCurrentValues, 5000);
+    });
+  </script>
+</body>
+</html>
