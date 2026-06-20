@@ -9,6 +9,7 @@
 #include <esp_sleep.h>
 #include <esp_wifi.h>
 #include "SPIFFS.h"
+#include <esp_rom_sys.h>
 
 // --- Configuration du firmware ---
 //#define SIMULATION_MODE
@@ -156,7 +157,7 @@ void recoverI2CBus();
  * -------------------------------------------------------------------------- */
 
 void IRAM_ATTR resetModule() {
-    ets_printf("Watchdog timeout! Redémarrage d'urgence...\n");
+    esp_rom_printf("Watchdog timeout! Redemarrage d'urgence...\n");
     esp_restart();
 }
 
